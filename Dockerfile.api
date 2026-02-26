@@ -1,0 +1,43 @@
+# Базовый образ с Node в Alpine — маленький размер и достаточная совместимость
+FROM node:20-alpine AS base
+
+# Стадия установки зависимостей: только package.json и lockfile, чтобы кэш слоя не сбрасывался при изменении кода
+FROM base AS deps
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY apps/api/package.json apps/api/
+RUN npm ci
+
+# Стадия сборки: копируем исходники API и Prisma, генерируем клиент и собираем NestJS
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json package-lock.json* ./
+COPY apps/api ./apps/api
+# @nestjs/cli ставится в apps/api/node_modules (по lockfile), а не в корень — копируем из deps
+COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
+
+# Генерация Prisma Client (нужен для nest build) и сборка приложения
+RUN npm run db:generate -w api && cd apps/api && ./node_modules/.bin/nest build
+
+# Продакшен-стадия: только рантайм и скомпилированный код, без dev-зависимостей
+FROM base AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# Копируем только нужное для запуска: package.json (для node_modules при необходимости) и собранный API
+COPY package.json package-lock.json* ./
+COPY apps/api/package.json apps/api/
+RUN npm ci --omit=dev
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+# Prisma generate пишет клиент в корневой node_modules, не в apps/api
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+
+WORKDIR /app/apps/api
+EXPOSE 3000
+
+# Слушать на 0.0.0.0, чтобы принимать запросы от nginx из другой контейнерной сети
+ENV HOST=0.0.0.0
+# DATABASE_URL собираем в контейнере из POSTGRES_* (не зависим от подстановки compose)
+CMD ["sh", "-c", "export DATABASE_URL=\"${DATABASE_URL:-postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@${POSTGRES_HOST:-postgres}:5432/$POSTGRES_DB}\" && npx prisma migrate deploy && node dist/main.js"]
