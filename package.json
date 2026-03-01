@@ -29,8 +29,10 @@
     "start": "npm run build && concurrently -n postgres,api,web \"podman-compose -f docker-compose.prod.yaml --env-file .env.prod up\" \"wait-on tcp:localhost:5433 && npm run start:api\" \"wait-on tcp:localhost:5433 && npm run start:web\"",
     "start:api": "dotenv -e .env.prod -- npm run start:prod -w api",
     "start:web": "npm run preview -w web",
-    "db:up": "podman-compose -f docker-compose.dev.yaml --env-file .env.dev up",
-    "db:migrate": "dotenv -e .env.dev -- npm run db:migrate -w api"
+    "db:dev:up": "podman-compose -f docker-compose.dev.yaml --env-file .env.dev up",
+    "db:dev:migrate": "dotenv -e .env.dev -- npm run db:migrate -w api",
+    "db:dev:down": "podman-compose -f docker-compose.dev.yaml down",
+    "db:prod:down": "podman-compose -f docker-compose.prod.yaml down"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

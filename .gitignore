@@ -7,8 +7,10 @@ node_modules/
 **/dist-ssr
 **/.turbo
 
-# Environment (секреты не коммитим)
+# Environment (секреты не коммитим; шаблоны с примерами — в репозитории)
 .env
+.env.dev
+.env.prod
 .env.*
 !.env.example.dev
 !.env.example.prod
