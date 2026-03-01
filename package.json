@@ -26,7 +26,7 @@
     "build": "npm run build:api && npm run build:web",
     "build:api": "npm run build -w api",
     "build:web": "npm run build -w web",
-    "start": "npm run build && concurrently -n postgres,api,web \"podman-compose -f docker-compose.prod.yaml --env-file .env.prod up\" \"wait-on tcp:localhost:5432 && npm run start:api\" \"wait-on tcp:localhost:5432 && npm run start:web\"",
+    "start": "npm run build && concurrently -n postgres,api,web \"podman-compose -f docker-compose.prod.yaml --env-file .env.prod up\" \"wait-on tcp:localhost:5433 && npm run start:api\" \"wait-on tcp:localhost:5433 && npm run start:web\"",
     "start:api": "dotenv -e .env.prod -- npm run start:prod -w api",
     "start:web": "npm run preview -w web",
     "db:up": "podman-compose -f docker-compose.dev.yaml --env-file .env.dev up",
