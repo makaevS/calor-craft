@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  productKinds ProductKind[]
+  products     Product[]
+  recipes      Recipe[]
+  dishes       Dish[]
+  meals        Meal[]
+
+  @@map("users")
+}
+
+model ProductKind {
+  id           String        @id @default(uuid())
+  userId       String        @map("user_id")
+  name         String
+  calories     Int
+  createdAt    DateTime      @default(now()) @map("created_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products     Product[]
+  recipeItems  RecipeItem[]
+  kindMeasureConversion KindMeasureConversion[]
+
+  @@map("product_kinds")
+}
+
+model Product {
+  id        String       @id @default(uuid())
+  userId    String       @map("user_id")
+  kindId    String       @map("kind_id")
+  name      String
+  calories  Int
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      ProductKind  @relation(fields: [kindId], references: [id], onDelete: Cascade)
+  mealItems MealItem[]
+  dishItems DishItem[]
+
+  @@map("products")
+}
+
+model Recipe {
+  id        String     @id @default(uuid())
+  userId    String     @map("user_id")
+  name      String
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     RecipeItem[]
+  dishes    Dish[]
+
+  @@map("recipes")
+}
+
+model RecipeItem {
+  id            String      @id @default(uuid())
+  recipeId      String      @map("recipe_id")
+  productKindId String      @map("product_kind_id")
+  quantity      Float       @map("quantity")
+  measure       Measure     @map("measure")
+  
+  recipe        Recipe      @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  productKind   ProductKind @relation(fields: [productKindId], references: [id], onDelete: Cascade)
+
+  @@map("recipe_items")
+}
+
+model Dish {
+  id        String     @id @default(uuid())
+  userId    String     @map("user_id")
+  recipeId  String?    @map("recipe_id")
+  name      String
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe    Recipe?    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  items     DishItem[]
+  mealItems MealItem[]
+
+  @@map("dishes")
+}
+
+model DishItem {
+  id            String  @id @default(uuid())
+  dishId        String  @map("dish_id")
+  productId     String  @map("product_id")
+  quantity      Float   @map("quantity")
+  measure       Measure @map("measure")
+
+  dish          Dish    @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("dish_items")
+}
+
+model Meal {
+  id        String     @id @default(uuid())
+  userId    String     @map("user_id")
+  date      DateTime   @db.Date
+  name      String
+  isPlanned Boolean    @default(false) @map("is_planned")
+  createdAt DateTime   @default(now()) @map("created_at")
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mealItems MealItem[]
+
+  @@map("meals")
+}
+
+model MealItem {
+  id            String   @id @default(uuid())
+  mealId        String   @map("meal_id")
+  productId     String?  @map("product_id")
+  dishId        String?  @map("dish_id")
+  quantity      Float    @map("quantity")
+  measure       Measure  @map("measure")
+
+  meal          Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  product       Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  dish          Dish?    @relation(fields: [dishId], references: [id], onDelete: SetNull)
+
+  @@map("meal_items")
+}
+
+model KindMeasureConversion {
+  id            String      @id @default(uuid())
+  productKindId String      @map("product_kind_id")
+  measure       Measure
+  grams         Float       @map("grams")
+
+  productKind   ProductKind @relation(fields: [productKindId], references: [id], onDelete: Cascade)
+
+  @@unique([productKindId, measure])
+  @@map("kind_unit_conversions")
+}
+
+enum Measure {
+  gram
+  kilogram
+  piece
+  tablespoon
+  teaspoon
+  cup
+  milliliter
+  liter
+}
