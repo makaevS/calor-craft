@@ -14,13 +14,26 @@ model User {
   passwordHash String   @map("password_hash")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  productKinds ProductKind[]
-  products     Product[]
-  recipes      Recipe[]
-  dishes       Dish[]
-  meals        Meal[]
+  productKinds   ProductKind[]
+  products      Product[]
+  recipes       Recipe[]
+  dishes        Dish[]
+  meals         Meal[]
+  refreshTokens RefreshToken[]
 
   @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
 }
 
 model ProductKind {
