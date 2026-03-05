@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  // В монорепо клиент генерируем в корневой node_modules, чтобы импорт из @prisma/client давал нормальные типы
+  output = "../../../node_modules/.prisma/client"
 }
 
 datasource db {

@@ -37,11 +37,12 @@ npm run dev
 - **API:** http://localhost:3000  
 - **Фронт:** http://localhost:5173  
 
-После изменений в `apps/api/prisma/schema.prisma` создай и примени миграции (dev Postgres должен быть запущен):
+Миграции применяются автоматически при старте API (как и в prod). После изменений в `apps/api/prisma/schema.prisma` нужно **создать** новую миграцию и применить её:
 
 ```bash
 npm run db:dev:migrate
 ```
+(Postgres должен быть запущен, например через `npm run dev` в другом терминале или после остановки dev.)
 
 ## Режим production (start)
 
@@ -64,7 +65,7 @@ npm run start
 | Команда | Описание |
 |--------|----------|
 | `npm run db:dev:up` | Только поднять dev Postgres (без API и фронта). |
-| `npm run db:dev:migrate` | Создать и применить миграции к dev-БД (Postgres должен быть запущен). |
+| `npm run db:dev:migrate` | Создать новую миграцию и применить к dev-БД (после правок в schema.prisma). |
 | `npm run db:dev:down` | Остановить контейнер dev Postgres. |
 | `npm run db:prod:down` | Остановить контейнер prod Postgres. |
 | `npm run build` | Собрать API и фронт (без запуска). |

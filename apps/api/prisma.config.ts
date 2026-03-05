@@ -1,7 +1,15 @@
 import { defineConfig, env } from 'prisma/config';
 
-// Только process.env — задаётся снаружи (dotenv-cli -e .env.prod / .env.dev). Не грузим .env здесь, чтобы не перезаписать порт.
-const databaseUrl = process.env.DATABASE_URL ?? env('DATABASE_URL');
+// process.env задаётся снаружи (dotenv-cli -e .env.dev и т.д.). Для prisma generate URL не нужен — подставляем заглушку.
+function getDatabaseUrl(): string {
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
+  try {
+    return env('DATABASE_URL');
+  } catch {
+    return 'postgresql://localhost:5432/placeholder';
+  }
+}
+const databaseUrl = getDatabaseUrl();
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
