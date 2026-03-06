@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+#root {
+  min-height: 100vh;
+  width: 100vw;
+  background: #9968bd;
+  background: linear-gradient(
+    142deg,
+    rgba(153, 104, 189, 1) 1%,
+    rgba(99, 99, 191, 1) 43%,
+    rgba(95, 173, 179, 1) 100%
+  );
+  --bg-transparent: rgba(229, 229, 229, 0.2);
+  --text-color: var(--color-amber-100);
+  --primary-color: var(--color-indigo-700);
+  --error-color: var(--color-red-500);
+}
