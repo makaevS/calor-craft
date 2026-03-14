@@ -1,21 +1,12 @@
-import { createRouter, RouterProvider } from "@tanstack/react-router";
-import { routeTree } from "../routeTree.gen";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { setDefaultOptions } from "date-fns";
+import { ru } from "date-fns/locale";
+import { QueryProvider } from "./providers/query-provider";
+import { RouterProvider } from "./providers/router-provider";
 
-const router = createRouter({ routeTree });
-
-declare module "@tanstack/react-router" {
-  interface Register {
-    router: typeof router;
-  }
-}
-
-const queryClient = new QueryClient();
+setDefaultOptions({ locale: ru });
 
 export const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <RouterProvider router={router} />
-    <ReactQueryDevtools />
-  </QueryClientProvider>
+  <QueryProvider>
+    <RouterProvider />
+  </QueryProvider>
 );

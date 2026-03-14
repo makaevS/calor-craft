@@ -48,6 +48,7 @@ model ProductKind {
   recipeItems  RecipeItem[]
   kindMeasureConversion KindMeasureConversion[]
 
+  @@unique([userId, name])
   @@map("product_kinds")
 }
 
@@ -64,6 +65,7 @@ model Product {
   mealItems MealItem[]
   dishItems DishItem[]
 
+  @@unique([userId, name])
   @@map("products")
 }
 

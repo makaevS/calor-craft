@@ -1,8 +1,10 @@
 import {
+  ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateProductDto } from './dto/create-product.dto.js';
 import type { UpdateProductDto } from './dto/update-product.dto.js';
@@ -11,16 +13,26 @@ import type { UpdateProductDto } from './dto/update-product.dto.js';
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(userId: string, dto: CreateProductDto) {
-    return this.prisma.product.create({
-      data: {
-        userId,
-        kindId: dto.kindId,
-        name: dto.name,
-        calories: dto.calories,
-      },
-      include: { kind: true },
-    });
+  async create(userId: string, dto: CreateProductDto) {
+    try {
+      return await this.prisma.product.create({
+        data: {
+          userId,
+          kindId: dto.kindId,
+          name: dto.name,
+          calories: dto.calories,
+        },
+        include: { kind: true },
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException('Product with this name already exists');
+      }
+      throw e;
+    }
   }
 
   findAll(userId: string, filters?: { kindId?: string; name?: string }) {
@@ -54,15 +66,25 @@ export class ProductsService {
 
   async update(userId: string, id: string, dto: UpdateProductDto) {
     await this.findOne(userId, id);
-    return this.prisma.product.update({
-      where: { id },
-      data: {
-        ...(dto.kindId !== undefined && { kindId: dto.kindId }),
-        ...(dto.name !== undefined && { name: dto.name }),
-        ...(dto.calories !== undefined && { calories: dto.calories }),
-      },
-      include: { kind: true },
-    });
+    try {
+      return await this.prisma.product.update({
+        where: { id },
+        data: {
+          ...(dto.kindId !== undefined && { kindId: dto.kindId }),
+          ...(dto.name !== undefined && { name: dto.name }),
+          ...(dto.calories !== undefined && { calories: dto.calories }),
+        },
+        include: { kind: true },
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException('Product with this name already exists');
+      }
+      throw e;
+    }
   }
 
   async remove(userId: string, id: string) {

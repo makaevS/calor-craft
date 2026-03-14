@@ -26,18 +26,12 @@ export class ProductKindsController {
   constructor(private readonly productKindsService: ProductKindsService) {}
 
   @Post()
-  create(
-    @Req() req: { user: JwtUser },
-    @Body() dto: CreateProductKindDto,
-  ) {
+  create(@Req() req: { user: JwtUser }, @Body() dto: CreateProductKindDto) {
     return this.productKindsService.create(req.user.id, dto);
   }
 
   @Get()
-  findAll(
-    @Req() req: { user: JwtUser },
-    @Query('name') name?: string,
-  ) {
+  findAll(@Req() req: { user: JwtUser }, @Query('name') name?: string) {
     return this.productKindsService.findAll(req.user.id, {
       ...(name !== undefined && name !== '' && { name }),
     });

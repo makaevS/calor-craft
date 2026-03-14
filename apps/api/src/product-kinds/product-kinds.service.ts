@@ -1,8 +1,10 @@
 import {
+  ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
-  ForbiddenException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateProductKindDto } from './dto/create-product-kind.dto.js';
 import type { UpdateProductKindDto } from './dto/update-product-kind.dto.js';
@@ -11,14 +13,26 @@ import type { UpdateProductKindDto } from './dto/update-product-kind.dto.js';
 export class ProductKindsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(userId: string, dto: CreateProductKindDto) {
-    return this.prisma.productKind.create({
-      data: {
-        userId,
-        name: dto.name,
-        calories: dto.calories,
-      },
-    });
+  async create(userId: string, dto: CreateProductKindDto) {
+    try {
+      return await this.prisma.productKind.create({
+        data: {
+          userId,
+          name: dto.name,
+          calories: dto.calories,
+        },
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          'Product kind with this name already exists',
+        );
+      }
+      throw e;
+    }
   }
 
   findAll(userId: string, filters?: { name?: string }) {
@@ -49,13 +63,25 @@ export class ProductKindsService {
 
   async update(userId: string, id: string, dto: UpdateProductKindDto) {
     await this.findOne(userId, id);
-    return this.prisma.productKind.update({
-      where: { id },
-      data: {
-        ...(dto.name !== undefined && { name: dto.name }),
-        ...(dto.calories !== undefined && { calories: dto.calories }),
-      },
-    });
+    try {
+      return await this.prisma.productKind.update({
+        where: { id },
+        data: {
+          ...(dto.name !== undefined && { name: dto.name }),
+          ...(dto.calories !== undefined && { calories: dto.calories }),
+        },
+      });
+    } catch (e) {
+      if (
+        e instanceof Prisma.PrismaClientKnownRequestError &&
+        e.code === 'P2002'
+      ) {
+        throw new ConflictException(
+          'Product kind with this name already exists',
+        );
+      }
+      throw e;
+    }
   }
 
   async remove(userId: string, id: string) {

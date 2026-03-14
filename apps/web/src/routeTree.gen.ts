@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './app/routes/__root'
 import { Route as RegisterRouteImport } from './app/routes/register'
+import { Route as ProductsRouteImport } from './app/routes/products'
+import { Route as ProductKindsRouteImport } from './app/routes/product-kinds'
 import { Route as LoginRouteImport } from './app/routes/login'
 import { Route as AboutRouteImport } from './app/routes/about'
 import { Route as IndexRouteImport } from './app/routes/index'
@@ -17,6 +19,16 @@ import { Route as IndexRouteImport } from './app/routes/index'
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductsRoute = ProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductKindsRoute = ProductKindsRouteImport.update({
+  id: '/product-kinds',
+  path: '/product-kinds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -39,12 +51,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/product-kinds': typeof ProductKindsRoute
+  '/products': typeof ProductsRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/product-kinds': typeof ProductKindsRoute
+  '/products': typeof ProductsRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesById {
@@ -52,20 +68,37 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/login': typeof LoginRoute
+  '/product-kinds': typeof ProductKindsRoute
+  '/products': typeof ProductsRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/login'
+    | '/product-kinds'
+    | '/products'
+    | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/login' | '/register'
-  id: '__root__' | '/' | '/about' | '/login' | '/register'
+  to: '/' | '/about' | '/login' | '/product-kinds' | '/products' | '/register'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/login'
+    | '/product-kinds'
+    | '/products'
+    | '/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   LoginRoute: typeof LoginRoute
+  ProductKindsRoute: typeof ProductKindsRoute
+  ProductsRoute: typeof ProductsRoute
   RegisterRoute: typeof RegisterRoute
 }
 
@@ -76,6 +109,20 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/products': {
+      id: '/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product-kinds': {
+      id: '/product-kinds'
+      path: '/product-kinds'
+      fullPath: '/product-kinds'
+      preLoaderRoute: typeof ProductKindsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -106,6 +153,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   LoginRoute: LoginRoute,
+  ProductKindsRoute: ProductKindsRoute,
+  ProductsRoute: ProductsRoute,
   RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
