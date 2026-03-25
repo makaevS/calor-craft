@@ -1,10 +1,9 @@
 import { Form } from "radix-ui";
 import { FormField, FormMessage } from "./components";
 import { useState, type SubmitEvent } from "react";
-import clsx from "clsx";
 import { useLogin } from "../api/useLogin";
-import { ButtonLoader } from "@shared/ui/ButtonLoader";
 import { Link } from "@tanstack/react-router";
+import { Button } from "@shared/ui";
 
 const SERVER_ERROR_MESSAGE = "Не удалось войти, попробуйте позже";
 
@@ -59,16 +58,15 @@ export const LoginPage = () => {
           <FormMessage match="valueMissing">Укажите пароль</FormMessage>
           {error && <FormMessage>{error}</FormMessage>}
         </FormField>
-        <Form.Submit
-          className={clsx("button-primary", isPending && "cursor-progress")}
-          disabled={isPending}
-        >
-          {isPending ? <ButtonLoader /> : "Войти"}
+        <Form.Submit asChild>
+          <Button variant="primary" pending={isPending}>
+            Войти
+          </Button>
         </Form.Submit>
         <Link to="/register">
-          <button className="button-secondary w-full">
+          <Button variant="secondary" className="w-full">
             Нет аккаунта? Зарегистрироваться
-          </button>
+          </Button>
         </Link>
       </Form.Root>
     </div>

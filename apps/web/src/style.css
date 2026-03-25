@@ -33,25 +33,41 @@ input:-webkit-autofill:focus {
 }
 
 @layer components {
+  .visually-hidden {
+    position: fixed;
+    transform: scale(0);
+  }
+
+  .button-base {
+    @apply relative flex cursor-pointer items-center justify-center gap-1 rounded-md p-2 font-semibold;
+  }
+
   .button-primary {
-    @apply cursor-pointer rounded-md bg-(--primary-color) p-2 font-semibold text-(--text-secondary-color) focus-visible:outline-2 focus-visible:outline-(--text-secondary-color);
+    @apply bg-(--primary-color) text-(--text-secondary-color) focus-visible:outline-2 focus-visible:outline-(--text-secondary-color);
   }
   .button-primary:hover {
     @apply bg-(--hover-color-primary);
   }
 
   .button-secondary {
-    @apply cursor-pointer rounded-md bg-(--bg-primary) p-2 font-semibold text-(--text-primary-color) focus-visible:outline-3 focus-visible:outline-(--primary-color);
+    @apply bg-(--bg-primary) text-(--text-primary-color) focus-visible:outline-3 focus-visible:outline-(--primary-color);
   }
   .button-secondary:hover {
     @apply bg-(--hover-color-secondary);
   }
 
   .button-danger {
-    @apply cursor-pointer rounded-md bg-(--error-color) p-2 font-semibold text-(--text-secondary-color) focus-visible:outline-3 focus-visible:outline-(--text-secondary-color);
+    @apply bg-(--error-color) text-(--text-secondary-color) focus-visible:outline-3 focus-visible:outline-(--text-secondary-color);
   }
   .button-danger:hover {
     @apply bg-(--hover-color-danger);
+  }
+
+  .button-ghost {
+    @apply bg-inherit text-inherit focus-visible:outline-3 focus-visible:outline-(--primary-color);
+  }
+  .button-ghost:hover {
+    @apply bg-(--hover-color-secondary);
   }
 
   .input {
@@ -72,5 +88,65 @@ input:-webkit-autofill:focus {
 
   .DialogContent:focus {
     outline: none;
+  }
+
+  .text {
+    @apply text-lg font-semibold;
+  }
+
+  .text-primary {
+    @apply text-(--text-primary-color);
+  }
+
+  .text-secondary {
+    @apply text-(--text-secondary-color);
+  }
+
+  .text-placeholder {
+    @apply text-(--text-placeholder-color);
+  }
+
+  .expand {
+    @apply overflow-hidden;
+  }
+
+  .expand-open {
+    @apply h-fit;
+  }
+
+  .expand-closed {
+    @apply h-0;
+  }
+
+  .accordion-root {
+    @apply flex flex-col rounded-md bg-(--bg-primary);
+  }
+
+  .accordion-title {
+    @apply cursor-pointer p-2;
+  }
+
+  .accordion-content {
+    @apply p-2;
+  }
+
+  .accordion-content-closed {
+    @apply p-0;
+  }
+
+  .dialog-content {
+    @apply fixed top-1/2 left-1/2 flex max-w-11/12 -translate-x-1/2 -translate-y-1/2 flex-col rounded-md bg-(--bg-dialog) p-2;
+  }
+
+  .dialog-content::backdrop {
+    @apply bg-black/50;
+  }
+
+  .dialog-title {
+    @apply flex items-center justify-between pl-2 text-xl font-bold text-(--text-primary-color);
+  }
+
+  .dialog-cross {
+    @apply h-9 w-9 p-1;
   }
 }
